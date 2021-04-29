@@ -1,17 +1,20 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.views import generic
 
 from .models import Titulo
 
 # Create your views here.
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+class IndexView(generic.ListView):
+    template_name = 'cotacoes/index.html'
+    # context_object_name = 'lista_titulos'
 
-def detalhaTitulo(request, titulo_id):
-    titulo = get_object_or_404(Titulo, pk=titulo_id)
-    return render(request, 'cotacoes/detalhaTitulo.html', {'titulo': titulo})
+    def get_queryset(self):
+        return Titulo.objects.order_by('codigo')
 
-def listaTitulos(request):
-    lista_titulos = Titulo.objects.order_by('codigo')
-    context = {'lista_titulos': lista_titulos}
-    return render(request, 'cotacoes/index.html', context)
+class DetalharTituloView(generic.DetailView):
+    model = Titulo
+    # template_name = 'cotacoes/titulo_detail.html'
+
+class MonitorarTituloView(generic.DetailView):
+    model = Titulo
+    template_name = 'cotacoes/monitorar.html'

@@ -20,7 +20,7 @@
     ></script>
   </head>
   <body>
-    {% if lista_titulos %}
+    {% if titulo_list %}
     <p>
       <center><h2>Títulos cadastrados</h2></center>
     </p>
@@ -34,7 +34,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for titulo in lista_titulos %}
+        {% for titulo in titulo_list %}
         <tr>
           <td>
             <a href="{% url 'detalhaTitulo' titulo.id %}"
@@ -43,7 +43,7 @@
           </td>
           <td>{{ titulo.descricao }}</td>
           <td>
-            <a href="%">
+            <a href="{% url 'monitorarTitulo' titulo.id %}">
               <i
                 class="bi bi-arrow-right-circle"
                 style="font-size: 1rem; color: cornflowerblue"
