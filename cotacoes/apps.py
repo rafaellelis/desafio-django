@@ -4,3 +4,11 @@ from django.apps import AppConfig
 class CotacoesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'cotacoes'
+
+    def ready(self):
+        from .models import ConfiguracaoApp
+        configuracoes = ConfiguracaoApp.objects.all()
+        if len(configuracoes) == 0:
+            config = ConfiguracaoApp.objects.create()
+            config.save(self)
+        
