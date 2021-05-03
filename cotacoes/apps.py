@@ -7,6 +7,7 @@ class CotacoesConfig(AppConfig):
 
     def ready(self):
         from .models import ConfiguracaoApp
+        from cotacoes import signals
         configuracoes = ConfiguracaoApp.objects.all()
         if len(configuracoes) == 0:
             config = ConfiguracaoApp.objects.create()

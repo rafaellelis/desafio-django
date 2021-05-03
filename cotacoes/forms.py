@@ -6,4 +6,4 @@ class ConfiguracaoForm(forms.ModelForm):
     
     class Meta:
         model = ConfiguracaoTitulo
-        fields = ('limite_inferior', 'limite_superior')
+        fields = ('limite_inferior', 'limite_superior', 'intervalo')

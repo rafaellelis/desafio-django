@@ -12,21 +12,21 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return Titulo.objects.order_by('codigo')
 
+
 class DetalharTituloView(generic.DetailView):
     model = Titulo
     # template_name = 'cotacoes/titulo_detail.html'
 
+
 def configuracao_new(request, titulo_id):
     titulo = Titulo.objects.get(pk=titulo_id)
     if request.method == "POST":
-         form = ConfiguracaoForm(request.POST)
-         if form.is_valid():
+        form = ConfiguracaoForm(request.POST)
+        if form.is_valid():
             configuracao = form.save(commit=False)
             configuracao.titulo = titulo
             configuracao.save()
             return redirect('detalhaTitulo', pk=titulo_id)
     else:
-         form = ConfiguracaoForm()
+        form = ConfiguracaoForm()
     return render(request, 'cotacoes/monitorar_form.html', {'form': form, 'titulo': titulo})
-    
-    
