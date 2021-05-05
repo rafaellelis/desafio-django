@@ -1,19 +1,23 @@
-{% extends 'cotacoes/base.html' %} {% block content %}
-<p>
-  <center><h2>Configurar limites para compra e venda</h2></center>
-</p>
-<h5>Título: {{titulo.codigo}} - {{ titulo.descricao }}</h5>
-<form method="POST">
-  {% csrf_token %} 
-  {% for field in form %}
-    <div class="form-group">
-      {{ field.errors }}
-      {{ field.label_tag }} {{ field }}
-      {% if field.help_text %}
-      <p class="help">{{ field.help_text|safe }}</p>
-      {% endif %}
+{% extends 'cotacoes/base.html' %}
+{% block content %}
+
+{% load crispy_forms_tags %}  
+
+<div class="container">
+  <p>
+    <center><h2>Configurar limites para compra e venda</h2></center>
+  </p>
+  <h5>Título: {{titulo.codigo}} - {{ titulo.descricao }}</h5>
+  <form method="POST">
+    {% csrf_token %} 
+    
+    {{ form|crispy }}
+
+    <div style="margin-top: 10px">
+      <button type="submit" class="save btn btn-primary">Salvar</button>
+      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger" class>Cancelar</a>
     </div>
-  {% endfor %}
-  <button type="submit" class="save btn btn-primary">Salvar</button>
-</form>
+    
+  </form>
+</div>
 {% endblock %}

@@ -6,10 +6,10 @@ class CotacoesConfig(AppConfig):
     name = 'cotacoes'
 
     def ready(self):
-        from .models import ConfiguracaoApp
+        # from .models import ConfiguracaoApp
         from cotacoes import signals
-        configuracoes = ConfiguracaoApp.objects.all()
-        if len(configuracoes) == 0:
-            config = ConfiguracaoApp.objects.create()
-            config.save(self)
+        # configuracoes = ConfiguracaoApp.objects.all()
+        # if len(configuracoes) == 0:
+        #     config = ConfiguracaoApp.objects.create()
+        #     config.save(self)
         

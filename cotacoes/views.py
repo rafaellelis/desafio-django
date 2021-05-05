@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views import generic
 
 from .forms import ConfiguracaoForm
-from .models import Titulo
+from .models import Titulo, ConfiguracaoTitulo, Status
 
 # Create your views here.
 class IndexView(generic.ListView):
@@ -30,3 +30,21 @@ def configuracao_new(request, titulo_id):
     else:
         form = ConfiguracaoForm()
     return render(request, 'cotacoes/monitorar_form.html', {'form': form, 'titulo': titulo})
+
+
+def configuracao_inativar(request, titulo_id):
+    configuracao = get_object_or_404(ConfiguracaoTitulo, pk=titulo_id)
+    configuracao.status = Status.inativo
+    configuracao.save()
+    return redirect('index')
+
+def configuracao_reativar(request, titulo_id):
+    configuracao = get_object_or_404(ConfiguracaoTitulo, pk=titulo_id)
+    configuracao.status = Status.ativo
+    configuracao.save()
+    return redirect('index')
+
+def configuracao_remover(request, titulo_id):
+    configuracao = get_object_or_404(ConfiguracaoTitulo, pk=titulo_id)
+    configuracao.delete()
+    return redirect('index')

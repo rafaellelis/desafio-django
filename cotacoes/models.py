@@ -1,10 +1,11 @@
 import json
 
 from django.db import models
-from .enums import StatusConfiguracao, Intervalo
+from .enums import Status, Intervalo
 from django_enum_choices.fields import EnumChoiceField
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from django.utils import timezone
+from decimal import Decimal
 
 
 class Titulo(models.Model):
@@ -12,6 +13,9 @@ class Titulo(models.Model):
         'Código do título', max_length=10, null=False, blank=False)
     descricao = models.CharField(
         'Descrição do título', max_length=100, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+    status = EnumChoiceField(Status, default=Status.ativo)
 
     def __str__(self):
         return "Título: %s" % (self.codigo + '-' + self.descricao)
@@ -27,9 +31,9 @@ class ConfiguracaoTitulo(models.Model):
         'Limite superior para venda', max_digits=8, decimal_places=2, null=False, blank=False)
     limite_inferior = models.DecimalField(
         'Limite inferior para compra', max_digits=8, decimal_places=2, null=False, blank=False)
-    status = EnumChoiceField(
-        StatusConfiguracao, default=StatusConfiguracao.ativa)
+    status = EnumChoiceField(Status, default=Status.ativo)
     created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
     intervalo = EnumChoiceField(
         Intervalo, default=Intervalo.quinze_minutos)
     tarefa = models.OneToOneField(
@@ -51,14 +55,16 @@ class ConfiguracaoTitulo(models.Model):
 
     @property
     def agendar(self):
+        if self.intervalo == Intervalo.um_minuto:
+            return IntervalSchedule.objects.get(every=1, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.quinze_minutos:
-            return IntervalSchedule.objects.get(every=15, period='minutes')
+            return IntervalSchedule.objects.get(every=15, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.trinta_minutos:
-            return IntervalSchedule.objects.get(every=30, period='minutes')
+            return IntervalSchedule.objects.get(every=30, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.quarenta_cinco_minutos:
-            return IntervalSchedule.objects.get(every=45, period='minutes')
+            return IntervalSchedule.objects.get(every=45, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.uma_hora:
-            return IntervalSchedule.objects.get(every=1, period='hours')
+            return IntervalSchedule.objects.get(every=1, period=IntervalSchedule.HOURS)
 
         raise NotImplementedError(
             '''Intervalo {interval} não foi adicionado.'''.format(
@@ -73,20 +79,11 @@ class Monitoramento(models.Model):
     valor = models.DecimalField(
         'Valor do título', max_digits=8, decimal_places=2, null=False, blank=False)
     timestamp = models.DateTimeField(
-        "Timestamp da coleta", null=False, blank=False)
+        "Timestamp da coleta", null=False, blank=False, auto_now_add=True)
+    ultima_atualizacao = models.DateTimeField(
+        "Data/Hora da última atualização do valor da ação", default=timezone.now)
+    variacao = models.DecimalField(
+        'Variação do valor da ação', max_digits=4, decimal_places=2, default=Decimal('0.00'))
 
     def __str__(self):
         return self.titulo.codigo + ': ' + self.valor + ' ' + self.timestamp
-
-
-class ConfiguracaoApp(models.Model):
-    intervalo_consulta = models.PositiveIntegerField(
-        'Intervalo definido para coleta dos dados', default=15, null=False, blank=False)
-
-    @classmethod
-    def create(cls):
-        config = cls(intervalo_consulta=15)
-        return config
-
-    def __str__(self):
-        return str(self.intervalo_consulta) + ' minutos'

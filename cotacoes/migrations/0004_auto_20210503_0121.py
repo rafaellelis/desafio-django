@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='configuracaotitulo',
             name='status',
-            field=django_enum_choices.fields.EnumChoiceField(choice_builder=django_enum_choices.choice_builders.value_value, choices=[('Ativa', 'Ativa'), ('Inativa', 'Inativa')], default=cotacoes.enums.StatusConfiguracao['ativa'], enum_class=cotacoes.enums.StatusConfiguracao, max_length=7),
+            field=django_enum_choices.fields.EnumChoiceField(choice_builder=django_enum_choices.choice_builders.value_value, choices=[('Ativo', 'Ativo'), ('Inativo', 'Inativo')], default=cotacoes.enums.Status['ativo'], enum_class=cotacoes.enums.Status, max_length=7),
         ),
         migrations.AddField(
             model_name='configuracaotitulo',
