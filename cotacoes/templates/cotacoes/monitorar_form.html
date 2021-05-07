@@ -7,15 +7,21 @@
   <p>
     <center><h2>Configurar limites para compra e venda</h2></center>
   </p>
-  <h5>Título: {{titulo.codigo}} - {{ titulo.descricao }}</h5>
   <form method="POST">
     {% csrf_token %} 
     
+    <div id="div_id_titulo" class="form-group"> 
+      <label for="id_titulo">Título</label> 
+      <div class=""> 
+        <span style="font-weight: bold;">{{ titulo.codigo }} - {{ titulo.descricao }}</span>
+      </div>
+    </div>
+    <br />
     {{ form|crispy }}
 
-    <div style="margin-top: 10px">
+    <div style="margin-top: 10px;">
       <button type="submit" class="save btn btn-primary">Salvar</button>
-      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger" class>Cancelar</a>
+      <a href="{% url 'index' %}" class="btn btn-danger" class>Cancelar</a>
     </div>
     
   </form>

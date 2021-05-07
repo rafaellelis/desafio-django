@@ -18,7 +18,7 @@ class Titulo(models.Model):
     status = EnumChoiceField(Status, default=Status.ativo)
 
     def __str__(self):
-        return "Título: %s" % (self.codigo + '-' + self.descricao)
+        return "%s" % (self.codigo + ' - ' + self.descricao)
 
     def possuiConfiguracao(self):
         return hasattr(self, 'configuracaotitulo')

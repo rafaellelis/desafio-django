@@ -146,5 +146,14 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # my config
-HG_BRASIL_API_URL= 'https://api.hgbrasil.com/finance/'
-HG_BRASIL_KEY=env('HG_BRASIL_KEY')
+HG_BRASIL_API_URL = 'https://api.hgbrasil.com/finance/'
+HG_BRASIL_KEY = env('HG_BRASIL_KEY')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
+EMAIL_RECIPIENT_DEFAULT=env('EMAIL_RECIPIENT_DEFAULT')

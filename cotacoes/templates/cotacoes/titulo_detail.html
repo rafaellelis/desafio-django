@@ -1,1 +1,69 @@
-{{ titulo }}
+{% extends 'cotacoes/base.html' %}
+{% block content %}
+
+<style>
+    label {font-weight: bold;}
+</style>
+
+<div class="container">
+  <p>
+    <center><h2>Detalhamento de Título</h2></center>
+  </p>
+    <br />
+
+    <div id="div_id_titulo" class="form-group"> 
+      <label>Título</label> 
+      <div class=""> 
+        <span style="font-weight: bold;">{{ titulo.codigo }} - {{ titulo.descricao }}</span>
+      </div>
+    </div>
+    <br />
+
+    <div id="div_id_situacao" class="form-group"> 
+      <label>Situação</label> 
+      <div class=""> 
+        <span>{{ titulo.status.value }}</span>
+      </div>
+    </div>
+    <br />
+
+    {% if titulo.possuiConfiguracao %}
+
+        <div class="row">
+            <div id="div_id_inferior" class="form-group col"> 
+                <label>Limite inferior</label> 
+                <div class=""> 
+                    <span>R$ {{ titulo.configuracaotitulo.limite_inferior }}</span>
+                </div>
+            </div>
+
+            <div id="div_id_superior" class="form-group col"> 
+                <label>Limite superior</label> 
+                <div class=""> 
+                    <span>R$ {{ titulo.configuracaotitulo.limite_superior }}</span>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div id="div_id_intervalor" class="form-group col"> 
+                <label>Intervalo</label> 
+                <div class=""> 
+                    <span>{{ titulo.configuracaotitulo.intervalo.value }}</span>
+                </div>
+            </div>
+
+            <div id="div_id_sit_configuracao" class="form-group col"> 
+                <label>Situação da configuração</label> 
+                <div class=""> 
+                    <span>{{ titulo.configuracaotitulo.status.value }}</span>
+                </div>
+            </div>
+        </div>
+        <br />
+        <a href="{% url 'index' %}" class="btn btn-secondary" class>Voltar</a>
+
+    {% endif %}
+    
+</div>
+{% endblock %}

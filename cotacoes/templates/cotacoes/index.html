@@ -22,7 +22,7 @@
       <td>{{ titulo.descricao }}</td>
       <td>
         {% if titulo.possuiConfiguracao %}
-        <a href="" data-toggle="tooltip" data-placement="top" title="Editar">
+        <a href="{% url 'configuracao_editar' titulo.id %}" data-toggle="tooltip" data-placement="top" title="Editar">
           <i
             class="bi bi-pencil"
             style="font-size: 1rem; color: #298fca"

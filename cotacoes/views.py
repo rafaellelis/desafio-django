@@ -19,16 +19,32 @@ class DetalharTituloView(generic.DetailView):
 
 
 def configuracao_new(request, titulo_id):
-    titulo = Titulo.objects.get(pk=titulo_id)
+    titulo = get_object_or_404(Titulo, pk=titulo_id)
     if request.method == "POST":
         form = ConfiguracaoForm(request.POST)
         if form.is_valid():
             configuracao = form.save(commit=False)
             configuracao.titulo = titulo
-            configuracao.save()
+            configuracao.save(force_insert=True)
             return redirect('detalhaTitulo', pk=titulo_id)
     else:
-        form = ConfiguracaoForm()
+        form = ConfiguracaoForm(initial={'titulo': titulo})
+    return render(request, 'cotacoes/monitorar_form.html', {'form': form, 'titulo': titulo})
+
+
+def configuracao_editar(request, titulo_id):
+    titulo = get_object_or_404(Titulo, pk=titulo_id)
+    if request.method == "POST":
+        configuracao_bd = get_object_or_404(ConfiguracaoTitulo, pk=titulo_id)
+        form = ConfiguracaoForm(request.POST, instance=configuracao_bd)
+        if form.is_valid():
+            configuracao = form.save(commit=False)
+            configuracao.titulo = titulo
+            configuracao.save(force_update=True)
+            return redirect('detalhaTitulo', pk=titulo_id)
+    else:
+        configuracao = get_object_or_404(ConfiguracaoTitulo, pk=titulo_id)
+        form = ConfiguracaoForm(instance=configuracao)
     return render(request, 'cotacoes/monitorar_form.html', {'form': form, 'titulo': titulo})
 
 
@@ -38,11 +54,13 @@ def configuracao_inativar(request, titulo_id):
     configuracao.save()
     return redirect('index')
 
+
 def configuracao_reativar(request, titulo_id):
     configuracao = get_object_or_404(ConfiguracaoTitulo, pk=titulo_id)
     configuracao.status = Status.ativo
     configuracao.save()
     return redirect('index')
+
 
 def configuracao_remover(request, titulo_id):
     configuracao = get_object_or_404(ConfiguracaoTitulo, pk=titulo_id)
