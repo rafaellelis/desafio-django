@@ -28,9 +28,9 @@ class ConfiguracaoTitulo(models.Model):
     titulo = models.OneToOneField(
         Titulo, on_delete=models.CASCADE, primary_key=True,)
     limite_superior = models.DecimalField(
-        'Limite superior para venda', max_digits=8, decimal_places=2, null=False, blank=False)
+        'Limite superior para venda (R$)', max_digits=8, decimal_places=2, null=False, blank=False)
     limite_inferior = models.DecimalField(
-        'Limite inferior para compra', max_digits=8, decimal_places=2, null=False, blank=False)
+        'Limite inferior para compra (R$)', max_digits=8, decimal_places=2, null=False, blank=False)
     status = EnumChoiceField(Status, default=Status.ativo)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -79,11 +79,14 @@ class Monitoramento(models.Model):
     valor = models.DecimalField(
         'Valor do título', max_digits=8, decimal_places=2, null=False, blank=False)
     timestamp = models.DateTimeField(
-        "Timestamp da coleta", null=False, blank=False, auto_now_add=True)
+        "Horário da coleta", null=False, blank=False, auto_now_add=True)
     ultima_atualizacao = models.DateTimeField(
         "Data/Hora da última atualização do valor da ação", default=timezone.now)
     variacao = models.DecimalField(
-        'Variação do valor da ação', max_digits=4, decimal_places=2, default=Decimal('0.00'))
+        'Variação (%)', max_digits=4, decimal_places=2, default=Decimal('0.00'))
+
+    def as_dict(self):
+        return {'timestamp': self.timestamp, 'valor': self.valor}
 
     def __str__(self):
         return self.titulo.codigo + ': ' + self.valor + ' ' + self.timestamp
