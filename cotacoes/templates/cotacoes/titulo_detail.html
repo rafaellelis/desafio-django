@@ -64,9 +64,8 @@
         <br />
         {% render_table table %}
         <div class="col-md-12">{{plot|safe}}</div>
-        <a href="{% url 'index' %}" class="btn btn-secondary" class>Voltar</a>
 
     {% endif %}
-    
+    <a href="{% url 'index' %}" class="btn btn-secondary" class>Voltar</a>
 </div>
 {% endblock %}

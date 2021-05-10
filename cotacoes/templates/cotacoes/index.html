@@ -1,76 +1,20 @@
 {% extends 'cotacoes/base.html' %}
 {% block content %}
-{% if titulo_list %}
+{% load render_table from django_tables2 %}
+{% load crispy_forms_tags %}
+
 <p>
   <center><h2>Títulos cadastrados</h2></center>
 </p>
+<br/>
+<div style="width:80%;margin: auto;">
 
-<table class="table table-striped table-hover">
-  <thead>
-    <tr>
-      <th scope="col">Código</th>
-      <th scope="col">Descrição</th>
-      <th scope="col">Monitorar</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for titulo in titulo_list %}
-    <tr>
-      <td>
-        <a href="{% url 'detalhaTitulo' titulo.id %}">{{ titulo.codigo }}</a>
-      </td>
-      <td>{{ titulo.descricao }}</td>
-      <td>
-        {% if titulo.possuiConfiguracao %}
-        <a href="{% url 'configuracao_editar' titulo.id %}" data-toggle="tooltip" data-placement="top" title="Editar">
-          <i
-            class="bi bi-pencil"
-            style="font-size: 1rem; color: #298fca"
-          ></i
-        ></a>
-        {% if titulo.configuracaotitulo.status.value == 'Ativo' %}
-          <a href="{% url 'configuracao_inativar' titulo.id %}"
-             onclick="return confirm('Deseja realmente inativar o monitoramento?')"
-             data-toggle="tooltip" data-placement="top" title="Inativar">
-            <i
-              class="bi bi-stop"
-              style="font-size: 1.3rem; color: #ef7564"
-            ></i
-          ></a>
-        {% else %}
-          <a href="{% url 'configuracao_reativar' titulo.id %}"
-             onclick="return confirm('Deseja realmente reativar o monitoramento?')"
-             data-toggle="tooltip" data-placement="top" title="Reativar">
-            <i
-              class="bi bi-arrow-clockwise"
-              style="font-size: 1rem; color: #5aac44"
-            ></i
-          ></a>
-        {% endif %}
-        <a href="{% url 'configuracao_remover' titulo.id %}"
-           onclick="return confirm('Deseja realmente remover o monitoramento e todos os seus registros?')"
-           data-toggle="tooltip" data-placement="top" title="Excluir">
-          <i
-            class="bi bi-trash"
-            style="font-size: 1rem; color: #323232"
-          ></i
-        ></a>
-        {% else %}
-        <a href="{% url 'configuracao_new' titulo.id %}"
-          data-toggle="tooltip" data-placement="top" title="Ativar">
-          <i
-            class="bi bi-play"
-            style="font-size: 1.3rem; color: #5aac44"
-          ></i
-        ></a>
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-{% else %}
-<p>Nenhum título cadastrado.</p>
-{% endif %}
+{% comment %} <form method="post" class="bootstrap">
+    {% csrf_token %} 
+     {% crispy filter.form %}
+    <input type="submit" />
+</form> {% endcomment %}
+<br />
+{% render_table table %}
+</div>
 {% endblock %}

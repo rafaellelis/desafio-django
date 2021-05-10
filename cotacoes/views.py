@@ -1,61 +1,76 @@
-
 import pandas as pd
-import plotly.graph_objects as go
+
+# import plotly.graph_objects as go
 import plotly.express as px
 
 from plotly.offline import plot
 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import generic
+from django_tables2 import RequestConfig
 
 from .forms import ConfiguracaoForm
 from .models import Titulo, ConfiguracaoTitulo, Status
-from .tables import MonitoramentoTable
+from .tables import MonitoramentoTable, TituloTable
+from .filters import TituloFilter
 
-class IndexView(generic.ListView):
-    template_name = "cotacoes/index.html"
+# class IndexView(generic.ListView):
+#     model = Titulo
+#     table_class = TituloTable
+#     template_name = "cotacoes/index.html"
 
-    def get_queryset(self):
-        return Titulo.objects.order_by("codigo")
+#     def get_queryset(self):
+#         return Titulo.objects.order_by("codigo")
+
+
+def titulo_all(request):
+    # titulos = Titulo.objects.all()
+    filter = TituloFilter(request.GET, queryset=Titulo.objects.all())
+    table = TituloTable(filter.qs, order_by=("acoes", "codigo"))
+    RequestConfig(request, paginate={"per_page": 25}).configure(table)
+    return render(request, "cotacoes/index.html", {"table": table, "filter": filter})
 
 
 def titulo_detail(request, titulo_id):
     titulo = get_object_or_404(Titulo, pk=titulo_id)
     monitoramentos = titulo.monitoramento_set.all()
     table = MonitoramentoTable(monitoramentos, order_by="-timestamp")
-    table.paginate(page=request.GET.get("page", 1), per_page=5)
 
-    df = pd.DataFrame([x.as_dict() for x in monitoramentos])
-    fig = monta_grafico(titulo, df)
-    # fig = go.Figure([go.Scatter(x=df['timestamp'], y=df['valor'])])
-    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+    plot_div = None
+    if monitoramentos:
+        df = pd.DataFrame([x.as_dict() for x in monitoramentos])
+        fig = monta_grafico(titulo, df)
+        # fig = go.Figure([go.Scatter(x=df['timestamp'], y=df['valor'])])
+        plot_div = plot(fig, output_type="div", include_plotlyjs=False)
 
+    RequestConfig(request, paginate={"per_page": 10}).configure(table)
     return render(request, "cotacoes/titulo_detail.html", {"titulo": titulo, "table": table, "plot": plot_div})
 
 
 def monta_grafico(titulo, df):
-    fig = px.area(df, x='timestamp', y='valor')
+    fig = px.area(df, x="timestamp", y="valor")
     fig.update_xaxes(
-    title_text = 'Data',
-    rangeslider_visible = True,
-    rangeselector = dict(
-        buttons = list([
-            dict(count = 1, label = '1D', step = 'day', stepmode = 'backward'),
-            dict(count = 7, label = '1W', step = 'day', stepmode = 'backward'),
-            dict(count = 1, label = '1M', step = 'month', stepmode = 'backward'),
-            dict(count = 6, label = '6M', step = 'month', stepmode = 'backward'),
-            dict(count = 1, label = 'Esse ano', step = 'year', stepmode = 'todate'),
-            dict(count = 1, label = '1A', step = 'year', stepmode = 'backward'),
-            dict(label = 'Todos', step = 'all')])))
+        title_text="Dados",
+        rangeslider_visible=True,
+        rangeselector=dict(
+            buttons=list(
+                [
+                    dict(count=1, label="1D", step="day", stepmode="backward"),
+                    dict(count=7, label="1W", step="day", stepmode="backward"),
+                    dict(count=1, label="1M", step="month", stepmode="backward"),
+                    dict(count=6, label="6M", step="month", stepmode="backward"),
+                    dict(count=1, label="Esse ano", step="year", stepmode="todate"),
+                    dict(count=1, label="1A", step="year", stepmode="backward"),
+                    dict(label="Todos", step="all"),
+                ]
+            )
+        ),
+    )
 
-    fig.update_yaxes(title_text = 'Valor da ação', tickprefix = 'R$')
-    fig.update_layout(showlegend = False,
-    title = {
-        'text': str(titulo),
-        'y':0.9,
-        'x':0.5,
-        'xanchor': 'center',
-        'yanchor': 'top'})
+    fig.update_yaxes(title_text="Valor da ação", tickprefix="R$")
+    fig.update_layout(
+        showlegend=False, title={"text": str(titulo), "y": 0.9, "x": 0.5, "xanchor": "center", "yanchor": "top"}
+    )
 
     return fig
 

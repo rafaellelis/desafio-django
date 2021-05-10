@@ -1,0 +1,49 @@
+{% if record.possuiConfiguracao %}
+<a
+  href="{% url 'configuracao_editar' record.id %}"
+  data-toggle="tooltip"
+  data-placement="top"
+  title="Editar"
+>
+  <i class="bi bi-pencil" style="font-size: 1rem; color: #298fca"></i
+></a>
+{% if record.configuracaotitulo.status.value == 'Ativo' %}
+<a
+  href="{% url 'configuracao_inativar' record.id %}"
+  onclick="return confirm('Deseja realmente inativar o monitoramento?')"
+  data-toggle="tooltip"
+  data-placement="top"
+  title="Inativar"
+>
+  <i class="bi bi-stop" style="font-size: 1.3rem; color: #ef7564"></i
+></a>
+{% else %}
+<a
+  href="{% url 'configuracao_reativar' record.id %}"
+  onclick="return confirm('Deseja realmente reativar o monitoramento?')"
+  data-toggle="tooltip"
+  data-placement="top"
+  title="Reativar"
+>
+  <i class="bi bi-arrow-clockwise" style="font-size: 1rem; color: #5aac44"></i
+></a>
+{% endif %}
+<a
+  href="{% url 'configuracao_remover' record.id %}"
+  onclick="return confirm('Deseja realmente remover o monitoramento e todos os seus registros?')"
+  data-toggle="tooltip"
+  data-placement="top"
+  title="Excluir"
+>
+  <i class="bi bi-trash" style="font-size: 1rem; color: #323232"></i
+></a>
+{% else %}
+<a
+  href="{% url 'configuracao_new' record.id %}"
+  data-toggle="tooltip"
+  data-placement="top"
+  title="Ativar"
+>
+  <i class="bi bi-play" style="font-size: 1.3rem; color: #5aac44"></i
+></a>
+{% endif %}

@@ -10,9 +10,9 @@ from decimal import Decimal
 
 class Titulo(models.Model):
     codigo = models.CharField(
-        'Código do título', max_length=10, null=False, blank=False)
+        'Código', max_length=10, null=False, blank=False)
     descricao = models.CharField(
-        'Descrição do título', max_length=100, null=False, blank=False)
+        'Descrição', max_length=100, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     status = EnumChoiceField(Status, default=Status.ativo)
@@ -22,6 +22,10 @@ class Titulo(models.Model):
 
     def possuiConfiguracao(self):
         return hasattr(self, 'configuracaotitulo')
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('detalhaTitulo', args=[str(self.id)])
 
 
 class ConfiguracaoTitulo(models.Model):
@@ -89,4 +93,4 @@ class Monitoramento(models.Model):
         return {'timestamp': self.timestamp, 'valor': self.valor}
 
     def __str__(self):
-        return self.titulo.codigo + ': ' + self.valor + ' ' + self.timestamp
+        return str(self.titulo.codigo) + ': ' + str(self.valor) + ' ' + str(self.timestamp)

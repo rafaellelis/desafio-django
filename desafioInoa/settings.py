@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_beat',
     'crispy_forms',
-    'django_tables2'
+    'django_tables2',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -148,6 +149,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # my config
 HG_BRASIL_API_URL = 'https://api.hgbrasil.com/finance/'
+HG_BRASIL_SYMBOLS = 'https://console.hgbrasil.com/documentation/finance/symbols'
 HG_BRASIL_KEY = env('HG_BRASIL_KEY')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
