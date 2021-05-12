@@ -11,10 +11,10 @@ from .models import ConfiguracaoTitulo, Monitoramento
 def create_or_update_periodicidade(sender, instance, created, **kwargs):
     if created:
         instance.configurar_periodicidade_tarefa()
-    else:
-        if instance.tarefa is not None:
-            instance.tarefa.enabled = instance.status == Status.ativo
-            instance.tarefa.save()
+    elif instance.tarefa is not None:
+        instance.tarefa.interval = instance.agendar
+        instance.tarefa.enabled = instance.status == Status.ativo
+        instance.tarefa.save()
 
 
 @receiver(post_delete, sender=ConfiguracaoTitulo)

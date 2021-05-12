@@ -81,7 +81,7 @@ class ConfiguracaoTitulo(models.Model):
 class Monitoramento(models.Model):
     titulo = models.ForeignKey(Titulo, on_delete=models.CASCADE)
     valor = models.DecimalField(
-        'Valor do título', max_digits=8, decimal_places=2, null=False, blank=False)
+        'Valor do título', max_digits=10, decimal_places=2, null=False, blank=False)
     timestamp = models.DateTimeField(
         "Horário da coleta", null=False, blank=False, auto_now_add=True)
     ultima_atualizacao = models.DateTimeField(

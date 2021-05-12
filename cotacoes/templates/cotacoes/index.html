@@ -1,7 +1,6 @@
 {% extends 'cotacoes/base.html' %}
 {% block content %}
-{% load render_table from django_tables2 %}
-{% load crispy_forms_tags %}
+{% load django_tables2 crispy_forms_tags %}
 
 <p>
   <center><h2>Títulos cadastrados</h2></center>
@@ -9,11 +8,8 @@
 <br/>
 <div style="width:80%;margin: auto;">
 
-{% comment %} <form method="post" class="bootstrap">
-    {% csrf_token %} 
-     {% crispy filter.form %}
-    <input type="submit" />
-</form> {% endcomment %}
+{% crispy filter.form filter.form.helper %}
+
 <br />
 {% render_table table %}
 </div>

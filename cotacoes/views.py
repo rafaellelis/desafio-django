@@ -9,26 +9,28 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views import generic
 from django_tables2 import RequestConfig
 
-from .forms import ConfiguracaoForm
+from .forms import ConfiguracaoForm, TituloFilterFormHelper
 from .models import Titulo, ConfiguracaoTitulo, Status
 from .tables import MonitoramentoTable, TituloTable
 from .filters import TituloFilter
 
-# class IndexView(generic.ListView):
-#     model = Titulo
-#     table_class = TituloTable
-#     template_name = "cotacoes/index.html"
+class IndexView(generic.ListView):
+    model = Titulo
+    table_class = TituloTable
+    template_name = "cotacoes/index.html"
 
-#     def get_queryset(self):
-#         return Titulo.objects.order_by("codigo")
+    def get_queryset(self):
+        return Titulo.objects.order_by("codigo")
 
-
-def titulo_all(request):
-    # titulos = Titulo.objects.all()
-    filter = TituloFilter(request.GET, queryset=Titulo.objects.all())
-    table = TituloTable(filter.qs, order_by=("acoes", "codigo"))
-    RequestConfig(request, paginate={"per_page": 25}).configure(table)
-    return render(request, "cotacoes/index.html", {"table": table, "filter": filter})
+    def get_context_data(self, **kwargs):
+        context = super(IndexView, self).get_context_data(**kwargs)
+        filter = TituloFilter(self.request.GET, queryset=self.get_queryset(**kwargs))
+        filter.form.helper = TituloFilterFormHelper()
+        table = TituloTable(filter.qs, order_by=("acoes", "codigo"))
+        RequestConfig(self.request, paginate={"per_page": 25}).configure(table)
+        context['filter'] = filter
+        context['table'] = table
+        return context
 
 
 def titulo_detail(request, titulo_id):
