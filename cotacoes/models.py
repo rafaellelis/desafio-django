@@ -59,8 +59,8 @@ class ConfiguracaoTitulo(models.Model):
 
     @property
     def agendar(self):
-        if self.intervalo == Intervalo.um_minuto:
-            return IntervalSchedule.objects.get(every=1, period=IntervalSchedule.MINUTES)
+        # if self.intervalo == Intervalo.um_minuto:
+        #     return IntervalSchedule.objects.get(every=1, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.quinze_minutos:
             return IntervalSchedule.objects.get(every=15, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.trinta_minutos:

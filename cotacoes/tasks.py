@@ -1,6 +1,6 @@
 from decimal import Decimal, ROUND_HALF_UP
 from celery import shared_task
-from .models import ConfiguracaoTitulo
+from .models import ConfiguracaoTitulo, Monitoramento
 from .enums import Status
 from .services import enviarEmail, obter_stock_price
 
@@ -19,9 +19,11 @@ def gravarMonitoramento(configuracao: ConfiguracaoTitulo):
     monitoramento = obter_stock_price(titulo)
 
     if monitoramento is not None:
-        monitoramento.save()
-        valor = Decimal(monitoramento.valor.quantize(Decimal('.01'), rounding=ROUND_HALF_UP))
-        if valor > configuracao.limite_superior or valor < configuracao.limite_inferior:
-            enviarEmail(configuracao, valor)
+        ultimo_monitoramento = Monitoramento.objects.order_by('ultima_atualizacao').last()
+        if ultimo_monitoramento is None or (monitoramento.ultima_atualizacao > ultimo_monitoramento.ultima_atualizacao):
+            monitoramento.save()
+            valor = Decimal(monitoramento.valor.quantize(Decimal('.01'), rounding=ROUND_HALF_UP))
+            if valor > configuracao.limite_superior or valor < configuracao.limite_inferior:
+                enviarEmail(configuracao, valor)
 
 

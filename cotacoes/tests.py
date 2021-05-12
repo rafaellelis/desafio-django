@@ -27,10 +27,10 @@ def mocked_obter_stock_price(*args, **kwargs):
     naive_dt = datetime.strptime("2021-05-10 20:08:47", "%Y-%m-%d %H:%M:%S")
     datetime_brasil = timezone("America/Recife").localize(naive_dt)
 
-    if args[0].codigo == "PETR4":
-        return Monitoramento.objects.create(titulo=args[0], valor=VALOR_SUPERIOR, ultima_atualizacao=datetime_brasil, variacao=Decimal("1.31"))
+    if args[0].codigo == "PETR4" or args[0].codigo == "PETR7":
+        return Monitoramento(titulo=args[0], valor=VALOR_SUPERIOR, ultima_atualizacao=datetime_brasil, variacao=Decimal("1.31"))
     elif args[0].codigo == "PETR3":
-        return Monitoramento.objects.create(titulo=args[0], valor=VALOR_INFERIOR, ultima_atualizacao=datetime_brasil, variacao=Decimal("1.31"))
+        return Monitoramento(titulo=args[0], valor=VALOR_INFERIOR, ultima_atualizacao=datetime_brasil, variacao=Decimal("1.31"))
 
     return None
 
@@ -127,38 +127,37 @@ class GravaMonitoramentoSemEnvioEmailTestCase(TestCase):
         from cotacoes import tasks
         tasks.gravarMonitoramento(configuracao)
         self.assertEqual(len(mail.outbox), 0)
-        
 
 class CriaAtualizaTarefaTestCase(TestCase):
     def setUp(self):
         Titulo.objects.create(codigo="PETR5", descricao="Petrobras 5")
-        IntervalSchedule.objects.create(every=1, period=IntervalSchedule.MINUTES)
+        IntervalSchedule.objects.create(every=15, period=IntervalSchedule.MINUTES)
         IntervalSchedule.objects.create(every=30, period=IntervalSchedule.MINUTES)
 
 
     def test_cria_tarefa_success(self):
         titulo = Titulo.objects.get(codigo="PETR5")
-        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.um_minuto)
+        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.quinze_minutos)
         configuracao.save()
 
         self.assertIsNotNone(configuracao.tarefa)
-        self.assertEquals(configuracao.tarefa.interval.every, 1)
+        self.assertEquals(configuracao.tarefa.interval.every, 15)
         self.assertEquals(configuracao.tarefa.interval.period, IntervalSchedule.MINUTES)
 
 
     def test_cria_tarefa_failed(self):
         titulo = Titulo.objects.get(codigo="PETR5")
-        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.quinze_minutos)
+        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.quarenta_cinco_minutos)
         self.assertRaises(IntervalSchedule.DoesNotExist, configuracao.save)
 
     
     def test_altera_periodicidade_success(self):
         titulo = Titulo.objects.get(codigo="PETR5")
-        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.um_minuto)
+        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.quinze_minutos)
         configuracao.save()
 
         self.assertIsNotNone(configuracao.tarefa)
-        self.assertEquals(configuracao.tarefa.interval.every, 1)
+        self.assertEquals(configuracao.tarefa.interval.every, 15)
         self.assertEquals(configuracao.tarefa.interval.period, IntervalSchedule.MINUTES)
 
         configuracao.intervalo = Intervalo.trinta_minutos
@@ -171,7 +170,7 @@ class CriaAtualizaTarefaTestCase(TestCase):
 
     def test_altera_status_success(self):
         titulo = Titulo.objects.get(codigo="PETR5")
-        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.um_minuto)
+        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"), intervalo=Intervalo.quinze_minutos)
         configuracao.save()
 
         self.assertIsNotNone(configuracao.tarefa)
@@ -211,3 +210,57 @@ class RemoveConfiguracaoTituloTestCase(TestCase):
         self.assertEquals(len(titulo.monitoramento_set.all()), 0)
         self.assertEquals(len(PeriodicTask.objects.all()), 0)
 
+
+class GravaMonitoramentoComMesmaDataTestCase(TestCase):
+    def setUp(self):
+        Titulo.objects.create(codigo="PETR7", descricao="Petrobras 7")
+        IntervalSchedule.objects.create(every=15, period=IntervalSchedule.MINUTES)
+
+    @patch("cotacoes.services.obter_stock_price", autospec=True, side_effect=mocked_obter_stock_price)
+    def test_gravarMonitoramento_mesma_data_failed(self, mock_services):
+        titulo = Titulo.objects.get(codigo="PETR7")
+        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"))
+        configuracao.save()
+
+        naive_dt = datetime.strptime("2021-05-10 20:08:47", "%Y-%m-%d %H:%M:%S")
+        datetime_brasil = timezone("America/Recife").localize(naive_dt)
+
+        Monitoramento.objects.create(titulo=titulo, valor=VALOR_SUPERIOR, ultima_atualizacao=datetime_brasil, variacao=Decimal("1.31"))
+
+        from cotacoes import tasks
+        tasks.gravarMonitoramento(configuracao)
+        self.assertEqual(len(titulo.monitoramento_set.all()), 1)
+        
+
+    @patch("cotacoes.services.obter_stock_price", autospec=True, side_effect=mocked_obter_stock_price)
+    def test_gravarMonitoramento_data_anterior_failed(self, mock_services):
+        titulo = Titulo.objects.get(codigo="PETR7")
+        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"))
+        configuracao.save()
+
+        naive_dt = datetime.strptime("2021-05-11 20:08:47", "%Y-%m-%d %H:%M:%S")
+        datetime_brasil = timezone("America/Recife").localize(naive_dt)
+
+        Monitoramento.objects.create(titulo=titulo, valor=VALOR_SUPERIOR, ultima_atualizacao=datetime_brasil, variacao=Decimal("1.31"))
+
+        from cotacoes import tasks
+        tasks.gravarMonitoramento(configuracao)
+        self.assertEqual(len(titulo.monitoramento_set.all()), 1)
+
+
+    @patch("cotacoes.services.obter_stock_price", autospec=True, side_effect=mocked_obter_stock_price)
+    def test_gravarMonitoramento_success(self, mock_services):
+        titulo = Titulo.objects.get(codigo="PETR7")
+        configuracao = ConfiguracaoTitulo(titulo=titulo, limite_superior=Decimal("30.00"), limite_inferior=Decimal("10.00"))
+        configuracao.save()
+
+        naive_dt = datetime.strptime("2021-05-08 20:08:47", "%Y-%m-%d %H:%M:%S")
+        datetime_brasil = timezone("America/Recife").localize(naive_dt)
+
+        monitoramento = Monitoramento(titulo=titulo, valor=VALOR_SUPERIOR, ultima_atualizacao=datetime_brasil, variacao=Decimal("1.31"))
+        monitoramento.save()
+
+        from cotacoes import tasks
+        tasks.gravarMonitoramento(configuracao)
+        self.assertEqual(len(titulo.monitoramento_set.all()), 2)
+        
