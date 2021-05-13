@@ -62,13 +62,17 @@ class ConfiguracaoTitulo(models.Model):
         # if self.intervalo == Intervalo.um_minuto:
         #     return IntervalSchedule.objects.get(every=1, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.quinze_minutos:
-            return IntervalSchedule.objects.get_or_create(every=15, period=IntervalSchedule.MINUTES)
+            intervalo = IntervalSchedule.objects.get_or_create(every=15, period=IntervalSchedule.MINUTES)
+            return intervalo
         if self.intervalo == Intervalo.trinta_minutos:
-            return IntervalSchedule.objects.get_or_create(every=30, period=IntervalSchedule.MINUTES)
+            intervalo = IntervalSchedule.objects.get_or_create(every=30, period=IntervalSchedule.MINUTES)
+            return intervalo
         if self.intervalo == Intervalo.quarenta_cinco_minutos:
-            return IntervalSchedule.objects.get_or_create(every=45, period=IntervalSchedule.MINUTES)
+            intervalo = IntervalSchedule.objects.get_or_create(every=40, period=IntervalSchedule.MINUTES)
+            return intervalo
         if self.intervalo == Intervalo.uma_hora:
-            return IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
+            intervalo = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
+            return intervalo
 
         raise NotImplementedError(
             '''Intervalo {interval} não foi adicionado.'''.format(
