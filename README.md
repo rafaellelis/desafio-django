@@ -88,3 +88,5 @@ Para o esquema de agendamento de tarefas, optei por usar o [Celery Beat](https:/
     celery -A desafioInoa worker --beat --scheduler django --loglevel=info
    ```
    Esse comando só deve ser utilizado em ambiente de desenvolvimento, não sendo recomendado o uso em produção.
+    <br/>
+3. Acesse a aplicação no endereço http://127.0.0.1:8000/cotacoes/
