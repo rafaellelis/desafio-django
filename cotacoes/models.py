@@ -48,6 +48,7 @@ class ConfiguracaoTitulo(models.Model):
     )
 
     def configurar_periodicidade_tarefa(self):
+
         self.tarefa = PeriodicTask.objects.create(
             name=str(self.titulo),
             task='titulo_task',
@@ -62,16 +63,16 @@ class ConfiguracaoTitulo(models.Model):
         # if self.intervalo == Intervalo.um_minuto:
         #     return IntervalSchedule.objects.get(every=1, period=IntervalSchedule.MINUTES)
         if self.intervalo == Intervalo.quinze_minutos:
-            intervalo = IntervalSchedule.objects.get_or_create(every=15, period=IntervalSchedule.MINUTES)
+            intervalo, _ = IntervalSchedule.objects.get_or_create(every=15, period=IntervalSchedule.MINUTES)
             return intervalo
         if self.intervalo == Intervalo.trinta_minutos:
-            intervalo = IntervalSchedule.objects.get_or_create(every=30, period=IntervalSchedule.MINUTES)
+            intervalo, _ = IntervalSchedule.objects.get_or_create(every=30, period=IntervalSchedule.MINUTES)
             return intervalo
         if self.intervalo == Intervalo.quarenta_cinco_minutos:
-            intervalo = IntervalSchedule.objects.get_or_create(every=40, period=IntervalSchedule.MINUTES)
+            intervalo, _ = IntervalSchedule.objects.get_or_create(every=40, period=IntervalSchedule.MINUTES)
             return intervalo
         if self.intervalo == Intervalo.uma_hora:
-            intervalo = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
+            intervalo, _ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.HOURS)
             return intervalo
 
         raise NotImplementedError(

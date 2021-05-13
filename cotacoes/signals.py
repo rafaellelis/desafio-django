@@ -20,6 +20,7 @@ def create_or_update_periodicidade(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=ConfiguracaoTitulo)
 def delete_configuracao_titulo(sender, instance, *args, **kwargs):
     # remove a tarefa
-    PeriodicTask.objects.get(pk=instance.tarefa.id).delete()
+    if instance.tarefa is not None:
+        PeriodicTask.objects.get(pk=instance.tarefa.id).delete()
     #remove os monitoramentos
     Monitoramento.objects.filter(titulo_id=instance.titulo_id).delete()
