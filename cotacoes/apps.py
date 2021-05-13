@@ -1,3 +1,4 @@
+import sys
 from django.apps import AppConfig
 
 class CotacoesConfig(AppConfig):
@@ -6,7 +7,7 @@ class CotacoesConfig(AppConfig):
 
     def ready(self):
         from cotacoes import signals
-        from cotacoes.services import cria_titulos_iniciar
-
-        cria_titulos_iniciar()
+        if 'runserver' in sys.argv:
+            from cotacoes.services import cria_titulos_iniciar
+            cria_titulos_iniciar()
         

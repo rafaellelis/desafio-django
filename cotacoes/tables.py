@@ -24,4 +24,4 @@ class MonitoramentoTable(tables.Table):
         attrs = {"class": "table table-striped table-hover"}
         model = Monitoramento
         template_name = "django_tables2/bootstrap4.html"
-        fields = ("timestamp", "valor", "variacao")
+        fields = ("timestamp", "valor", "ultima_atualizacao", "variacao")
